@@ -85,12 +85,12 @@ const SignIn = () => {
                   登录
                 </Button>
                 <View className="flex-row justify-between mt-4">
-                  <Text onPress={() => console.log("Forgot Password Pressed")}>
+                  <Text onPress={() => router.push("/(auth)/ForgetPassword")}>
                     忘记密码？
                   </Text>
                   <Text
                     status="primary"
-                    onPress={() => router.push("/sign-up")}
+                    onPress={() => router.push("/SignUp")}
                   >
                     注册账号
                   </Text>

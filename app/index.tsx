@@ -1,4 +1,4 @@
-import SignIn from "./(auth)/sign-in";
+import SignIn from "./(auth)/SignIn";
 
 const App = () => {
   return <SignIn />;
