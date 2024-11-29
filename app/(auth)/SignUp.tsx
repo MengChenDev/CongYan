@@ -22,6 +22,7 @@ import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, StatusBar, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 const SignUp = () => {
   const [form, setForm] = useState({
@@ -86,10 +87,33 @@ const SignUp = () => {
       RegisterAPI(form.email, form.code, form.username, form.password).then(
         (data) => {
           if (data.code === 200) {
+            Toast.show({
+              type: "success",
+              text1: "注册成功",
+              visibilityTime: 3000,
+            });
             router.back();
+          } else if (data.code === 400) {
+            Toast.show({
+              type: "error",
+              text1: "邮箱或用户名已被注册",
+              visibilityTime: 3000,
+            });
+          } else if (data.code === 401) {
+            Toast.show({
+              type: "error",
+              text1: "验证码错误",
+              visibilityTime: 3000,
+            });
           }
         }
       );
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "请检查表单填写是否正确",
+        visibilityTime: 3000,
+      });
     }
   };
 
@@ -127,11 +151,27 @@ const SignUp = () => {
       // 发送验证码逻辑
       RequestVerificationCodeAPI(form.email, "register").then((data) => {
         if (data.code === 200) {
+          Toast.show({
+            type: "success",
+            text1: "验证码发送成功",
+            visibilityTime: 3000,
+          });
           setCountdown(60);
-          setIsSendingCode(false);
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "验证码发送失败",
+            visibilityTime: 3000,
+          });
         }
+        setIsSendingCode(false);
       });
     } else {
+      Toast.show({
+        type: "error",
+        text1: "请填写正确的邮箱",
+        visibilityTime: 3000,
+      });
       setErrors({ ...errors, email: "邮箱格式不正确" });
     }
   };
@@ -232,6 +272,7 @@ const SignUp = () => {
           </ScrollView>
         </SafeAreaView>
       </ApplicationProvider>
+      <Toast />
     </>
   );
 };

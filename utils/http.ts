@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GetToken, Logout } from "./user";
+import { GetUserData, Logout } from "./user";
 
 const httpInstance = axios.create({
   baseURL: "http://47.98.250.28:8080/api",
@@ -11,11 +11,11 @@ const httpInstance = axios.create({
 
 // 添加请求拦截器
 httpInstance.interceptors.request.use(
-  function (config) {
+  async function (config) {
     // 在发送请求之前做些什么
-    const token = GetToken();
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+    const user = await GetUserData();
+    if (user?.token) {
+      config.headers["Authorization"] = `Bearer ${user?.token}`;
     }
     return config;
   },

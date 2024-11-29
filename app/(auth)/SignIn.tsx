@@ -21,10 +21,16 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import "@/global.css";
 import { router } from "expo-router";
+import Toast from "react-native-toast-message";
+import { LoginAPI } from "@/apis/user";
+import { GetUserData, SetUserData } from "@/utils/user";
+import CustomButton from "@/components/CustomButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignIn = () => {
   const [form, setForm] = useState({ account: "", password: "" });
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleSecureEntry = (): void => {
     setSecureTextEntry(!secureTextEntry);
@@ -36,7 +42,39 @@ const SignIn = () => {
     </TouchableWithoutFeedback>
   );
 
-  const handleLogin = () => {};
+  const handleLogin = () => {
+    if (!form.account || !form.password) {
+      Toast.show({
+        type: "error",
+        text1: "请输入账号和密码",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    LoginAPI(form.account, form.password)
+      .then(async (data) => {
+        if (data.code === 200) {
+          //router.push("Home");
+          Toast.show({
+            type: "success",
+            text1: "登录成功",
+            visibilityTime: 3000,
+          });
+          SetUserData(data.data);
+        } else {
+          Toast.show({
+            type: "error",
+            text1: data.message,
+            visibilityTime: 3000,
+          });
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const handleChange = (name: string, value: string) => {
     setForm({ ...form, [name]: value });
@@ -81,17 +119,18 @@ const SignIn = () => {
                     handleChange("password", nextValue)
                   }
                 />
-                <Button className="mt-4" onPress={handleLogin}>
+                <CustomButton
+                  loading={isLoading}
+                  className="mt-4"
+                  onPress={handleLogin}
+                >
                   登录
-                </Button>
+                </CustomButton>
                 <View className="flex-row justify-between mt-4">
                   <Text onPress={() => router.push("/(auth)/ForgetPassword")}>
                     忘记密码？
                   </Text>
-                  <Text
-                    status="primary"
-                    onPress={() => router.push("/SignUp")}
-                  >
+                  <Text status="primary" onPress={() => router.push("/SignUp")}>
                     注册账号
                   </Text>
                 </View>
