@@ -1,6 +1,8 @@
+import { ApplicationProvider } from "@ui-kitten/components";
 import { useFonts } from "expo-font";
 import { Stack, SplashScreen } from "expo-router";
 import { useEffect } from "react";
+import * as eva from "@eva-design/eva";
 import Toast from "react-native-toast-message";
 
 SplashScreen.preventAutoHideAsync();
@@ -17,10 +19,12 @@ export default function RootLayout() {
   if (!fontsLoaded && !error) return null;
 
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      
-    </Stack>
+    <ApplicationProvider {...eva} theme={eva.light}>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+    </ApplicationProvider>
   );
 }
