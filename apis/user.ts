@@ -66,7 +66,7 @@ export const RegisterAPI = async (email: string, code: string, username: string,
     const response = await http<RegisterResType>({
       url: "/auth/register",
       method: "POST",
-      params: {
+      data: {
         email,
         code,
         username,

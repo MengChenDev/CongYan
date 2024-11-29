@@ -64,7 +64,7 @@ const ResetPassword = () => {
         <SafeAreaView className="bg-white h-full">
           <StatusBar translucent backgroundColor="transparent" />
           <ScrollView contentContainerStyle={{ height: "100%" }}>
-            <View className="w-full justify-center items-center h-[85vh] px-4">
+            <View className="w-full justify-center items-center h-[75vh] px-4">
               <View className="flex-row items-center mb-4">
                 <Image
                   className="w-[60px] h-[60px]"
