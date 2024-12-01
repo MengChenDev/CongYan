@@ -1,10 +1,12 @@
 import TabIcon from "@/components/TabIcon";
 import { icons } from "@/constants";
 import { Tabs } from "expo-router";
+import { StatusBar } from "react-native";
 
 const TabsLayout = () => {
   return (
     <>
+      <StatusBar backgroundColor="#F7F9FC" /> 
       <Tabs
         screenOptions={
           {

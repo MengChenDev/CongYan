@@ -3,7 +3,7 @@ import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
 import SignIn from "./(auth)/SignIn";
-import "@/global.css"
+import "@/global.css";
 
 const Index = () => {
   const [user, setUser] = useState(null);
@@ -20,7 +20,12 @@ const Index = () => {
       </>
     );
   } else {
-    return <Redirect href="/home" />;
+    return (
+      <>
+        <Redirect href="/home" />
+        <Toast />
+      </>
+    );
   }
 };
 

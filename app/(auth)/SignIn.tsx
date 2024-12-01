@@ -56,13 +56,13 @@ const SignIn = () => {
     LoginAPI(form.account, form.password)
       .then(async (data) => {
         if (data.code === 200) {
-          //router.push("Home");
           Toast.show({
             type: "success",
             text1: "登录成功",
             visibilityTime: 3000,
           });
           SetUserData(data.data);
+          router.replace("/home");
         } else {
           Toast.show({
             type: "error",
