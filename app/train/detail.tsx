@@ -21,6 +21,7 @@ const BackIcon = (props: any): IconElement => (
 );
 
 const TrainDetailPage = () => {
+  let loadingTexts2 = {};
   const { data } = useLocalSearchParams<{ data: string }>();
   const item: TrainText = JSON.parse(data);
   const [playedTexts, setPlayedTexts] = useState<{
@@ -32,17 +33,18 @@ const TrainDetailPage = () => {
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
 
   const renderBackAction = (): TouchableWebElement => (
-    <TopNavigationAction onPress={router.back} icon={BackIcon} />
+    <TopNavigationAction onPress={handleBackPress} icon={BackIcon} />
   );
 
-  // useEffect(() => {
-  //   return () => {
-  //     Object.values(playedTexts).forEach((sound) => {
-  //       sound.stopAsync();
-  //       sound.unloadAsync();
-  //     });
-  //   };
-  // }, [playedTexts]);
+  const handleBackPress = async () => {
+    // 修复返回时音频继续播放的问题
+    if (playingIndex !== null && playedTexts[playingIndex]) {
+      await playedTexts[playingIndex].pauseAsync();
+    }
+    loadingTexts[-1] = true;
+    setLoadingTexts({});
+    router.back();
+  };
 
   const handleTextPlay = async (key: number, text: string) => {
     if (loadingTexts[key]) {
@@ -68,7 +70,9 @@ const TrainDetailPage = () => {
         });
         setPlayedTexts((prev) => ({ ...prev, [key]: sound }));
         setPlayingIndex(key);
-        await sound.playAsync();
+        if (!loadingTexts[-1]) {
+          await sound.playAsync();
+        }
       }
       setLoadingTexts((prev) => ({ ...prev, [key]: false }));
     }
