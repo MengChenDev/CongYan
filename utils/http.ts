@@ -3,6 +3,7 @@ import { GetUserData, Logout } from "./user";
 
 const httpInstance = axios.create({
   baseURL: "http://47.98.250.28:8080/api",
+  // baseURL: "http://api.congyan.mengchen.xyz:8080/api",
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",

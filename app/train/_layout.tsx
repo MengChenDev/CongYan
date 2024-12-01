@@ -4,8 +4,8 @@ import { StatusBar } from "react-native";
 const TrainLayout = () => {
   return (
     <>
+      <StatusBar backgroundColor="#FFFFFF" />
       <Stack>
-        <StatusBar backgroundColor="#FFFFFF" />
         <Stack.Screen
           name="list"
           options={{ headerShown: true, title: "练习" }}

@@ -53,3 +53,77 @@ export const GetTrainTextByCategoryAPI = async (category: string) => {
     throw error;
   }
 }
+
+/**
+ * 音频文件base64编码，byte[]，mp3格式
+ *
+ * RestBeanTtsVO
+ */
+export type GetTTSAPIResType = {
+  /**
+   * 状态码
+   */
+  code?: number;
+  /**
+   * 响应数据
+   */
+  data?: TtsVO;
+  id?: number;
+  /**
+   * 其他消息
+   */
+  message?: string;
+  [property: string]: any;
+}
+
+/**
+* 响应数据
+*
+* TtsVO
+*/
+export type TtsVO = {
+  audioBase64?: number[];
+  [property: string]: any;
+}
+
+export const GetTTSAPI = async (text: string) => {
+  try {
+    const response = await http<GetTTSAPIResType>({
+      url: '/dysarthria/getTTS',
+      method: 'POST',
+      data: {
+        text,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export const GetMicrosoftTTSAPI = async (text: string, language: string, voice: string) => {
+  try {
+    const response = await http({
+      url: `https://eastasia.tts.speech.microsoft.com/cognitiveservices/v1`,
+      method: 'POST',
+      headers: {
+        'Ocp-Apim-Subscription-Key': "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        'Content-Type': 'application/ssml+xml',
+        'X-Microsoft-OutputFormat': 'audio-16khz-128kbitrate-mono-mp3',
+      },
+      data: `
+        <speak version='1.0' xml:lang='${language}'>
+          <voice xml:lang='${language}' xml:gender='Female' name='${voice}'>
+            ${text}
+          </voice>
+        </speak>
+      `,
+      responseType: 'arraybuffer',
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
