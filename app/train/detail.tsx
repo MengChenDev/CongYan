@@ -1,4 +1,4 @@
-import { GetTTSAPI } from "@/apis/train";
+import { DysarthriaAPI, GetTTSAPI } from "@/apis/train";
 import SmartTouchable from "@/components/SmartTouchable";
 import { TrainText } from "@/store/train";
 import {
@@ -36,6 +36,10 @@ const TrainDetailPage = () => {
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [recording, setRecording] = useState<Audio.Recording | undefined>(
+    undefined
+  );
+  const [permissionResponse, requestPermission] = Audio.usePermissions();
 
   const renderBackAction = (): TouchableWebElement => (
     <TopNavigationAction onPress={handleBackPress} icon={BackIcon} />
@@ -94,13 +98,48 @@ const TrainDetailPage = () => {
     }
   };
 
-  const handleRecordStart = () => {
+  const handleRecordStart = async () => {
     setIsRecording(true);
+    try {
+      if (permissionResponse?.status !== "granted") {
+        console.log("Requesting permission..");
+        await requestPermission();
+      }
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      console.log("Starting recording..");
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      setRecording(recording);
+      console.log("Recording started");
+    } catch (err) {
+      console.error("Failed to start recording", err);
+    }
   };
 
-  const handleRecordEnd = () => {
+  const handleRecordEnd = async () => {
     setIsRecording(false);
+    setRecording(undefined);
+    await recording?.stopAndUnloadAsync();
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+    });
+    const uri = recording?.getURI();
+    console.log("Recording stopped and stored at", uri);
+
+    if (uri) {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      const file = new File([blob], "recording.m4a", { type: "audio/m4a" });
+      const text = item.text.split("\n")[selectedIndex];
+      await DysarthriaAPI(text, file);
+    }
   };
+
   return (
     <Layout className="h-full" level="1">
       <TopNavigation

@@ -95,6 +95,7 @@ export type UserData = {
   username: string;
   [property: string]: any;
 }
+
 export const LoginAPI = async (account: string, password: string) => {
   try {
     const formData = new FormData();

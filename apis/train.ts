@@ -127,3 +127,25 @@ export const GetMicrosoftTTSAPI = async (text: string, language: string, voice: 
     throw error;
   }
 }
+
+export const DysarthriaAPI = async (text: string, audioFile: File) => {
+  try {
+    const formData = new FormData();
+    formData.append('audioFile', audioFile);
+    const response = await http({
+      url: '/dysarthria/getResult',
+      method: 'POST',
+      params: {
+        text
+      },
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
