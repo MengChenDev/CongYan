@@ -43,6 +43,7 @@ httpInstance.interceptors.response.use(
   function (error) {
     // 超出 2xx 范围的状态码都会触发该函数。
     // 对响应错误做点什么
+    console.error(error.config.url, error.response?.status, error.response?.data);
     return Promise.reject(error);
   },
 );

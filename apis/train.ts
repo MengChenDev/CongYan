@@ -132,7 +132,7 @@ export const DysarthriaAPI = async (text: string, audioFile: File) => {
   try {
     const formData = new FormData();
     formData.append('audioFile', audioFile);
-    const response = await http({
+    const response = await http<DysarthriaResType>({
       url: '/dysarthria/getResult',
       method: 'POST',
       params: {
@@ -149,3 +149,137 @@ export const DysarthriaAPI = async (text: string, audioFile: File) => {
     throw error;
   }
 }
+
+
+
+
+export const DysarthriaByBase64API = async (text: string, audioBase64: string) => {
+  try {
+    const response = await http({
+      url: '/dysarthria/getResultByBase64',
+      method: 'POST',
+      data: {
+        audioBase64,
+        text
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+
+
+/**
+ * 返回每个汉字的详细发音信息
+ *
+ * RestBeanDysarthriaResultVO
+ */
+export type DysarthriaResType = {
+  /**
+   * 状态码
+   */
+  code?: number;
+  /**
+   * 响应数据
+   */
+  data?: DysarthriaResultVO;
+  id?: number;
+  /**
+   * 其他消息
+   */
+  message?: string;
+  [property: string]: any;
+}
+
+/**
+* 响应数据
+*
+* DysarthriaResultVO
+*/
+export type DysarthriaResultVO = {
+  sd?: Sd[];
+  single_score?: number[];
+  sm?: Sm[];
+  total_score?: number;
+  ym?: Ym[];
+  [property: string]: any;
+}
+
+export enum Sd {
+  SDDifferent = "SD_DIFFERENT",
+  SDSame = "SD_SAME",
+}
+
+export enum Sm {
+  SmDiffMethod = "SM_DIFF_METHOD",
+  SmDiffPart = "SM_DIFF_PART",
+  SmDifferent = "SM_DIFFERENT",
+  SmSame = "SM_SAME",
+}
+
+export enum Ym {
+  YmDiffShape = "YM_DIFF_SHAPE",
+  YmDiffShapeAndSmooth = "YM_DIFF_SHAPE_AND_SMOOTH",
+  YmDiffSmooth = "YM_DIFF_SMOOTH",
+  YmDiffStruct = "YM_DIFF_STRUCT",
+  YmDifferent = "YM_DIFFERENT",
+  YmSame = "YM_SAME",
+  YmSameLike = "YM_SAME_LIKE",
+}
+
+// export const DysarthriaAPI = async (text: string, audioBase64: string) => {
+//   try {
+//     const response = await http({
+//       url: '/dysarthria/getResult',
+//       method: 'POST',
+//       params: {
+//         text
+//       },
+//       data: {
+//         audioBase64
+//       },
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error(error);
+//     throw error;
+//   }
+// }
+
+
+// export const generateRandomEnumValue = <T extends object>(enumObj: T): T[keyof T] => {
+//   const enumValues = Object.values(enumObj);
+//   const randomIndex = Math.floor(Math.random() * enumValues.length);
+//   return enumValues[randomIndex];
+// };
+
+// export const MockDysarthriaAPI = async () => {
+//   const mockText = "在腊八这天";
+//   const mockAudioBase64 = "U29tZUJhc2U0RW5jb2RlZFN0cmluZw=="; // This is a placeholder base64 string
+
+//   const textLength = mockText.length;
+
+//   const mockResponse: DysarthriaResType = {
+//     code: 200,
+//     data: {
+//       sd: Array.from({ length: textLength }, () => generateRandomEnumValue(Sd)),
+//       single_score: Array.from({ length: textLength }, () => Math.floor(Math.random() * 100)),
+//       sm: Array.from({ length: textLength }, () => generateRandomEnumValue(Sm)),
+//       total_score: Math.floor(Math.random() * 100),
+//       ym: Array.from({ length: textLength }, () => generateRandomEnumValue(Ym)),
+//     },
+//     id: 1,
+//     message: "Success",
+//   };
+
+//   return mockResponse;
+// };

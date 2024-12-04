@@ -1,4 +1,4 @@
-import { DysarthriaAPI, GetTTSAPI } from "@/apis/train";
+import { DysarthriaAPI, DysarthriaByBase64API, GetTTSAPI } from "@/apis/train";
 import SmartTouchable from "@/components/SmartTouchable";
 import { TrainText } from "@/store/train";
 import {
@@ -16,11 +16,24 @@ import { TouchableWebElement } from "@ui-kitten/components/devsupport";
 import { Audio, AVPlaybackStatus } from "expo-av";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useRef, useState } from "react";
-import { ImageProps, StyleSheet, View, ScrollView } from "react-native";
-
+import {
+  ImageProps,
+  StyleSheet,
+  View,
+  ScrollView,
+  Platform,
+} from "react-native";
+import {
+  FFmpegKit,
+  FFmpegKitConfig,
+  ReturnCode,
+} from "ffmpeg-kit-react-native";
+import ScoreText from "@/components/ScoreText";
 const BackIcon = (props: any): IconElement => (
   <Icon {...props} name="arrow-back-outline" />
 );
+
+//FFmpegKitConfig.init();
 
 const TrainDetailPage = () => {
   const { data } = useLocalSearchParams<{ data: string }>();
@@ -40,6 +53,8 @@ const TrainDetailPage = () => {
     undefined
   );
   const [permissionResponse, requestPermission] = Audio.usePermissions();
+  const [currentText, setCurrentText] = useState<string>("");
+  const [dysarthriaData, setDysarthriaData] = useState<any>({});
 
   const renderBackAction = (): TouchableWebElement => (
     <TopNavigationAction onPress={handleBackPress} icon={BackIcon} />
@@ -55,6 +70,7 @@ const TrainDetailPage = () => {
     router.back();
   };
   const handleTextPlay = async (key: number, text: string) => {
+    setCurrentText(text);
     if (loadingTexts[key]) {
       return;
     }
@@ -132,13 +148,65 @@ const TrainDetailPage = () => {
     console.log("Recording stopped and stored at", uri);
 
     if (uri) {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const file = new File([blob], "recording.m4a", { type: "audio/m4a" });
-      const text = item.text.split("\n")[selectedIndex];
-      await DysarthriaAPI(text, file);
+      if (Platform.OS === "web") {
+        const response = await fetch(uri);
+        console.log(response);
+        const blob = await response.blob();
+        const file = new File([blob], "recording.m4a", { type: "audio/mpeg" });
+        const text = item.text.split("\n")[selectedIndex];
+        const res = await DysarthriaAPI(text, file);
+        const data = res.data;
+        setDysarthriaData(data);
+      } else {
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64data = reader.result;
+          const text = item.text.split("\n")[selectedIndex];
+          if (typeof base64data === "string") {
+            const res = await DysarthriaByBase64API(text, base64data);
+            const data = res.data;
+            setDysarthriaData(data);
+          } else {
+            console.error("Failed to convert blob to base64 string");
+          }
+        };
+        reader.readAsDataURL(blob);
+      }
     }
   };
+
+  //
+
+  // const handleRecordEnd = async () => {
+  //   setIsRecording(false);
+  //   setRecording(undefined);
+  //   await recording?.stopAndUnloadAsync();
+  //   await Audio.setAudioModeAsync({
+  //     allowsRecordingIOS: false,
+  //   });
+  //   const uri = recording?.getURI();
+  //   console.log("Recording stopped and stored at", uri);
+
+  //   if (uri) {
+  //     const pcmUri = uri.replace(".m4a", ".pcm");
+  //     await FFmpegKit.execute(`-i ${uri} -f s16le -acodec pcm_s16le ${pcmUri}`)
+  //       .then(async (session) => {
+  //         const returnCode = await session.getReturnCode();
+  //         if (ReturnCode.isSuccess(returnCode)) {
+  //           console.log("PCM file created at", pcmUri);
+  //           const response = await fetch(pcmUri);
+  //           const blob = await response.blob();
+  //           const file = new File([blob], "recording.pcm", { type: "audio/pcm" });
+  //           const text = item.text.split("\n")[selectedIndex];
+  //           await DysarthriaAPI(text, file);
+  //         } else {
+  //           console.error("Failed to convert to PCM", returnCode);
+  //         }
+  //       });
+  //   }
+  // };
 
   return (
     <Layout className="h-full" level="1">
@@ -177,49 +245,51 @@ const TrainDetailPage = () => {
           </Layout>
         </ScrollView>
 
-        <View
-          className="flex-row items-center w-full justify-around absolute"
-          style={{ bottom: 64 }}
-        >
-          <View style={styles.FunctionContainer}>
-            <SmartTouchable
-              activeOpacity={0.5}
-              onPress={() =>
-                handleTextPlay(
-                  selectedIndex,
-                  item.text.split("\n")[selectedIndex]
-                )
-              }
-            >
-              <View style={styles.FunctionButton}>
-                <Icon
-                  style={[
-                    styles.FunctionIcon,
-                    isPlaying && { tintColor: theme["color-primary-500"] },
-                  ]}
-                  name={
-                    isPlaying ? "pause-circle-outline" : "play-circle-outline"
-                  }
-                />
-              </View>
-            </SmartTouchable>
-          </View>
-          <View style={styles.FunctionContainer}>
-            <SmartTouchable
-              activeOpacity={0.5}
-              onPressIn={handleRecordStart}
-              onPressOut={handleRecordEnd}
-            >
-              <View style={styles.FunctionButton}>
-                <Icon
-                  style={[
-                    styles.FunctionIcon,
-                    isRecording && { tintColor: theme["color-primary-500"] },
-                  ]}
-                  name={isRecording ? "mic" : "mic-outline"}
-                />
-              </View>
-            </SmartTouchable>
+        <View className="w-full absolute" style={{ bottom: 64 }}>
+          <Card className="mb-8 mx-4">
+            <ScoreText text={currentText} data={dysarthriaData}></ScoreText>
+          </Card>
+          <View className="flex-row items-center justify-around">
+            <View style={styles.FunctionContainer}>
+              <SmartTouchable
+                activeOpacity={0.5}
+                onPress={() =>
+                  handleTextPlay(
+                    selectedIndex,
+                    item.text.split("\n")[selectedIndex]
+                  )
+                }
+              >
+                <View style={styles.FunctionButton}>
+                  <Icon
+                    style={[
+                      styles.FunctionIcon,
+                      isPlaying && { tintColor: theme["color-primary-500"] },
+                    ]}
+                    name={
+                      isPlaying ? "pause-circle-outline" : "play-circle-outline"
+                    }
+                  />
+                </View>
+              </SmartTouchable>
+            </View>
+            <View style={styles.FunctionContainer}>
+              <SmartTouchable
+                activeOpacity={0.5}
+                onPressIn={handleRecordStart}
+                onPressOut={handleRecordEnd}
+              >
+                <View style={styles.FunctionButton}>
+                  <Icon
+                    style={[
+                      styles.FunctionIcon,
+                      isRecording && { tintColor: theme["color-primary-500"] },
+                    ]}
+                    name={isRecording ? "mic" : "mic-outline"}
+                  />
+                </View>
+              </SmartTouchable>
+            </View>
           </View>
         </View>
       </Layout>
