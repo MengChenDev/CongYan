@@ -46,6 +46,7 @@ const TrainDetailPage = () => {
   );
   const [dysarthriaData, setDysarthriaData] = useState<any>({});
   const [toastKey, setToastKey] = useState<number>(0);
+  const [isPracticingAll, setIsPracticingAll] = useState<boolean>(false);
 
   const renderBackAction = (): TouchableWebElement => (
     <TopNavigationAction onPress={handleBackPress} icon={BackIcon} />
@@ -60,8 +61,15 @@ const TrainDetailPage = () => {
     setLoadingTexts({});
     router.back();
   };
-  const handleTextPlay = async (key: number, text: string) => {
-    setCurrentText(text);
+
+  const handleTextPlay = async (key: number, text: string, replace = true) => {
+    if (key === -1) {
+      setIsPracticingAll(true);
+    }
+    if (replace) {
+      setIsPracticingAll(false);
+      setCurrentText(text);
+    }
     setDysarthriaData({});
     if (loadingTexts[key]) {
       return;
@@ -107,6 +115,9 @@ const TrainDetailPage = () => {
   };
 
   const handleRecordStart = async () => {
+    if (isRecording) {
+      return;
+    }
     setIsRecording(true);
 
     let toastKey = Toast.loading("录音准备中...", 0);
@@ -134,7 +145,7 @@ const TrainDetailPage = () => {
             <Icon
               style={[
                 styles.FunctionIcon,
-                isRecording && {
+                {
                   tintColor: "#FFFFFF",
                 },
               ]}
@@ -151,8 +162,12 @@ const TrainDetailPage = () => {
   };
 
   const handleRecordEnd = async () => {
+    if (!recording) {
+      return;
+    }
     setIsRecording(false);
     setRecording(undefined);
+    Toast.remove(toastKey);
     await recording?.stopAndUnloadAsync();
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
@@ -161,15 +176,13 @@ const TrainDetailPage = () => {
     console.log("Recording stopped and stored at", uri);
 
     if (uri) {
-      Toast.remove(toastKey);
       let dysarthriaToastKey = Toast.loading("分析中...", 0);
       if (Platform.OS === "web") {
         const response = await fetch(uri);
         console.log(response);
         const blob = await response.blob();
         const file = new File([blob], "recording.m4a", { type: "audio/mpeg" });
-        const text = item.text.split("\n")[selectedIndex];
-        const res = await DysarthriaAPI(text, file);
+        const res = await DysarthriaAPI(currentText, file);
         const data = res.data;
         setDysarthriaData(data);
         Toast.remove(dysarthriaToastKey);
@@ -193,6 +206,7 @@ const TrainDetailPage = () => {
         };
         reader.readAsDataURL(blob);
       }
+    } else {
     }
   };
 
@@ -234,20 +248,25 @@ const TrainDetailPage = () => {
             </Layout>
           </ScrollView>
 
-          <View className="w-full absolute" style={{ bottom: 64 }}>
-            <Card className="mb-8 mx-4">
+          <View className="w-full absolute" style={{ bottom: 32 }}>
+            <Card className="mb-4 mx-4">
               <ScoreText text={currentText} data={dysarthriaData}></ScoreText>
             </Card>
             <View className="flex-row items-center justify-around">
               <View style={styles.FunctionContainer}>
                 <SmartTouchable
                   activeOpacity={0.5}
-                  onPress={() =>
+                  onPress={() => {
+                    // if (isPracticingAll) {
+                    //   Toast.fail("暂不支持全文朗读", 1);
+                    //   return;
+                    // }
                     handleTextPlay(
                       selectedIndex,
-                      item.text.split("\n")[selectedIndex]
-                    )
-                  }
+                      item.text.split("\n")[selectedIndex],
+                      false
+                    );
+                  }}
                 >
                   <View style={styles.FunctionButton}>
                     <Icon
@@ -284,6 +303,30 @@ const TrainDetailPage = () => {
                 </SmartTouchable>
               </View>
             </View>
+            <View className="mt-4" style={styles.PracticeAllContainer}>
+              <SmartTouchable
+                activeOpacity={0.5}
+                onPress={() => {
+                  setIsPracticingAll(!isPracticingAll);
+                  setDysarthriaData({});
+                  if (isPracticingAll) {
+                    setCurrentText(item.text.split("\n")[selectedIndex]);
+                    return;
+                  }
+                  setCurrentText(item.text);
+                }}
+              >
+                <View style={styles.PracticeAllButton}>
+                  <Text
+                    className="text-center"
+                    category="h6"
+                    status={isPracticingAll ? "primary" : "basic"}
+                  >
+                    全文练习
+                  </Text>
+                </View>
+              </SmartTouchable>
+            </View>
           </View>
         </Layout>
       </Layout>
@@ -304,20 +347,35 @@ const styles = StyleSheet.create({
   FunctionContainer: {
     overflow: "hidden",
     borderRadius: 999,
-  },
-  FunctionButton: {
-    backgroundColor: "white",
-    padding: 16,
-    borderRadius: 999,
     elevation: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
+  FunctionButton: {
+    backgroundColor: "white",
+    padding: 16,
+  },
   FunctionIcon: {
     width: 48,
     height: 48,
+  },
+  PracticeAllContainer: {
+    overflow: "hidden",
+    borderRadius: 999,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    width: "50%",
+    alignSelf: "center",
+  },
+  PracticeAllButton: {
+    backgroundColor: "white",
+    padding: 16,
+    textAlign: "center",
   },
 });
 
