@@ -215,6 +215,37 @@ const TrainDetailPage = () => {
       <Layout className="h-full" level="1">
         <TopNavigation
           accessoryLeft={renderBackAction}
+          accessoryRight={() => (
+            <View className="">
+              <Text>建议时长：{item.suggestedDuration}秒</Text>
+              <Text>
+                难度分级：
+                <Text
+                  status={
+                    item.grade === "easy"
+                      ? "success"
+                      : item.grade === "common"
+                      ? "info"
+                      : item.grade === "hard"
+                      ? "warning"
+                      : item.grade === "challenging"
+                      ? "danger"
+                      : "basic"
+                  }
+                >
+                  {item.grade === "easy"
+                    ? "简单"
+                    : item.grade === "common"
+                    ? "普通"
+                    : item.grade === "hard"
+                    ? "困难"
+                    : item.grade === "challenging"
+                    ? "挑战"
+                    : "未知"}
+                </Text>
+              </Text>
+            </View>
+          )}
           alignment="center"
           title={item.title}
           subtitle={item.author}
@@ -249,9 +280,14 @@ const TrainDetailPage = () => {
           </ScrollView>
 
           <View className="w-full absolute" style={{ bottom: 32 }}>
-            <Card className="mb-4 mx-4">
-              <ScoreText text={currentText} data={dysarthriaData}></ScoreText>
-            </Card>
+            <Layout style={styles.CurrentTextContainer} className="mb-4 mx-4">
+              <ScrollView className="p-4">
+                <ScoreText text={currentText} data={dysarthriaData}></ScoreText>
+                {Platform.OS === "android" && isPracticingAll && (
+                  <Layout className="h-8"></Layout>
+                )}
+              </ScrollView>
+            </Layout>
             <View className="flex-row items-center justify-around">
               <View style={styles.FunctionContainer}>
                 <SmartTouchable
@@ -343,6 +379,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  CurrentTextContainer: {
+    overflow: "hidden",
+    borderRadius: 16,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    maxHeight: 200,
   },
   FunctionContainer: {
     overflow: "hidden",

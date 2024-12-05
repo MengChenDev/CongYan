@@ -1,7 +1,8 @@
 import { DysarthriaResultVO } from "@/apis/train";
 import { Card, Modal, Text, Button } from "@ui-kitten/components";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, Platform, StatusBar } from "react-native";
 
 const getStatus = (score: number) => {
   if (score >= 90) return "success";
@@ -10,37 +11,37 @@ const getStatus = (score: number) => {
   return "danger";
 };
 const SM_DESCRIPTIONS: {
-  [key: string]: { description: string; status: string };
+  [key: string]: { desc: string; status: string };
 } = {
-  SM_SAME: { description: "声母相同", status: "success" },
-  SM_DIFF_PART: { description: "声母发音部位不同", status: "warning" },
-  SM_DIFF_METHOD: { description: "声母发音方式不同", status: "info" },
-  SM_DIFFERENT: { description: "发音完全不同", status: "danger" },
+  SM_SAME: { desc: "声母相同", status: "success" },
+  SM_DIFF_PART: { desc: "声母发音部位不同", status: "warning" },
+  SM_DIFF_METHOD: { desc: "声母发音方式不同", status: "info" },
+  SM_DIFFERENT: { desc: "发音完全不同", status: "danger" },
 };
 
 const YM_DESCRIPTIONS: {
-  [key: string]: { description: string; status: string };
+  [key: string]: { desc: string; status: string };
 } = {
-  YM_SAME: { description: "完全相同", status: "success" },
-  YM_SAME_LIKE: { description: "发音方式和口型都相同", status: "info" },
-  YM_DIFF_SHAPE: { description: "发音结构相同，口型不同", status: "warning" },
-  YM_DIFF_STRUCT: { description: "发音口型相同，结构不同", status: "warning" },
+  YM_SAME: { desc: "完全相同", status: "success" },
+  YM_SAME_LIKE: { desc: "发音方式和口型都相同", status: "info" },
+  YM_DIFF_SHAPE: { desc: "发音结构相同，口型不同", status: "warning" },
+  YM_DIFF_STRUCT: { desc: "发音口型相同，结构不同", status: "warning" },
   YM_DIFF_SMOOTH: {
-    description: "发音口型相同且粗结构相同，发音细结构不同",
+    desc: "发音口型相同且粗结构相同，发音细结构不同",
     status: "info",
   },
   YM_DIFF_SHAPE_AND_SMOOTH: {
-    description: "发音粗结构相同，口型不同",
+    desc: "发音粗结构相同，口型不同",
     status: "warning",
   },
-  YM_DIFFERENT: { description: "完全不同", status: "danger" },
+  YM_DIFFERENT: { desc: "完全不同", status: "danger" },
 };
 
 const SD_DESCRIPTIONS: {
-  [key: string]: { description: string; status: string };
+  [key: string]: { desc: string; status: string };
 } = {
-  SD_SAME: { description: "发音相同", status: "success" },
-  SD_DIFFERENT: { description: "发音不同", status: "danger" },
+  SD_SAME: { desc: "发音相同", status: "success" },
+  SD_DIFFERENT: { desc: "发音不同", status: "danger" },
 };
 
 const ScoreText = ({
@@ -62,6 +63,13 @@ const ScoreText = ({
   if (data == null) {
     data = {};
   }
+
+  const handleSpecializedPractice = () => {
+    router.push({
+      pathname: "/train/specialized",
+      params: { character: modalContent.character },
+    });
+  };
 
   const handlePress = (charData: {
     character: string;
@@ -126,7 +134,9 @@ const ScoreText = ({
 
       <Modal
         visible={modalContent.show}
-        backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        backdropStyle={{
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
         onBackdropPress={() =>
           setModalContent({
             character: "",
@@ -138,6 +148,7 @@ const ScoreText = ({
           })
         }
       >
+        <StatusBar backgroundColor="rgba(0, 0, 0, 0.5)" />
         <Card disabled={true}>
           <Text category="h6">
             字符: <Text category="h6">{modalContent.character}</Text>
@@ -148,7 +159,7 @@ const ScoreText = ({
               category="h6"
               status={SM_DESCRIPTIONS[modalContent.sm]?.status}
             >
-              {SM_DESCRIPTIONS[modalContent.sm]?.description}
+              {SM_DESCRIPTIONS[modalContent.sm]?.desc}
             </Text>
           </Text>
           <Text category="h6">
@@ -157,7 +168,7 @@ const ScoreText = ({
               category="h6"
               status={YM_DESCRIPTIONS[modalContent.ym]?.status}
             >
-              {YM_DESCRIPTIONS[modalContent.ym]?.description}
+              {YM_DESCRIPTIONS[modalContent.ym]?.desc}
             </Text>
           </Text>
           <Text category="h6">
@@ -166,7 +177,7 @@ const ScoreText = ({
               category="h6"
               status={SD_DESCRIPTIONS[modalContent.sd]?.status}
             >
-              {SD_DESCRIPTIONS[modalContent.sd]?.description}
+              {SD_DESCRIPTIONS[modalContent.sd]?.desc}
             </Text>
           </Text>
           <Text category="h6">
@@ -176,6 +187,9 @@ const ScoreText = ({
             </Text>
           </Text>
         </Card>
+        <Button onPress={handleSpecializedPractice} className="mt-4">
+          专项练习
+        </Button>
       </Modal>
     </View>
   );
