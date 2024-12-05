@@ -195,7 +195,7 @@ const TrainDetailPage = () => {
           const base64data = reader.result;
           const text = item.text.split("\n")[selectedIndex];
           if (typeof base64data === "string") {
-            const res = await DysarthriaByBase64API(text, base64data);
+            const res = await DysarthriaByBase64API(currentText, base64data);
             const data = res.data;
             setDysarthriaData(data);
             Toast.remove(dysarthriaToastKey);

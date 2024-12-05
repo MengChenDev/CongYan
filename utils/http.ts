@@ -1,5 +1,6 @@
 import axios from "axios";
 import { GetUserData, Logout } from "./user";
+import { Platform } from "react-native";
 
 const httpInstance = axios.create({
   baseURL: "http://47.98.250.28:8080/api",
@@ -17,6 +18,10 @@ httpInstance.interceptors.request.use(
     const user = await GetUserData();
     if (user?.token) {
       config.headers["Authorization"] = `Bearer ${user?.token}`;
+    }
+
+    if (Platform.OS === "android") {
+      console.info("Android", config.url, config.data);
     }
     return config;
   },
