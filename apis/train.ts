@@ -233,53 +233,139 @@ export enum Ym {
   YmSameLike = "YM_SAME_LIKE",
 }
 
-// export const DysarthriaAPI = async (text: string, audioBase64: string) => {
-//   try {
-//     const response = await http({
-//       url: '/dysarthria/getResult',
-//       method: 'POST',
-//       params: {
-//         text
-//       },
-//       data: {
-//         audioBase64
-//       },
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//     });
-//     return response.data;
-//   } catch (error) {
-//     console.error(error);
-//     throw error;
-//   }
-// }
+/**
+ * 每个汉字的拼音，不包括声母韵母列表
+ *
+ * RestBeanPinyinVO
+ */
+export type GetPinYinResType = {
+  /**
+   * 状态码
+   */
+  code?: number;
+  /**
+   * 响应数据
+   */
+  data?: PinyinVO;
+  id?: number;
+  /**
+   * 其他消息
+   */
+  message?: string;
+  [property: string]: any;
+}
 
+/**
+* 响应数据
+*
+* PinyinVO
+*/
+export type PinyinVO = {
+  pinyin?: string[];
+  text?: string;
+  [property: string]: any;
+}
 
-// export const generateRandomEnumValue = <T extends object>(enumObj: T): T[keyof T] => {
-//   const enumValues = Object.values(enumObj);
-//   const randomIndex = Math.floor(Math.random() * enumValues.length);
-//   return enumValues[randomIndex];
-// };
+export const GetPinyinAPI = async (text: string) => {
+  try {
+    const response = await http<GetPinYinResType>({
+      url: '/dysarthria/getPinyin',
+      method: 'GET',
+      params: {
+        text,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 
-// export const MockDysarthriaAPI = async () => {
-//   const mockText = "在腊八这天";
-//   const mockAudioBase64 = "U29tZUJhc2U0RW5jb2RlZFN0cmluZw=="; // This is a placeholder base64 string
+/**
+ * 每个汉字的拼音声母韵母列表
+ *
+ * RestBeanPinyinDetailVO
+ */
+export type GetPinyinDetailResType = {
+  /**
+   * 状态码
+   */
+  code?: number;
+  /**
+   * 响应数据
+   */
+  data?: PinyinDetailVO;
+  id?: number;
+  /**
+   * 其他消息
+   */
+  message?: string;
+  [property: string]: any;
+}
 
-//   const textLength = mockText.length;
+/**
+* 响应数据
+*
+* PinyinDetailVO
+*/
+export type PinyinDetailVO = {
+  sm_detail?: Initial[];
+  textPinyin?: TextPinyin;
+  ym_detail?: Vowel[];
+  [property: string]: any;
+}
 
-//   const mockResponse: DysarthriaResType = {
-//     code: 200,
-//     data: {
-//       sd: Array.from({ length: textLength }, () => generateRandomEnumValue(Sd)),
-//       single_score: Array.from({ length: textLength }, () => Math.floor(Math.random() * 100)),
-//       sm: Array.from({ length: textLength }, () => generateRandomEnumValue(Sm)),
-//       total_score: Math.floor(Math.random() * 100),
-//       ym: Array.from({ length: textLength }, () => generateRandomEnumValue(Ym)),
-//     },
-//     id: 1,
-//     message: "Success",
-//   };
+/**
+* com.congyan.entity.dto.Initial
+*
+* Initial
+*/
+export type Initial = {
+  articulationPoint?: string;
+  id?: number;
+  letter?: string;
+  pronunciationMethod?: string;
+  [property: string]: any;
+}
 
-//   return mockResponse;
-// };
+/**
+* TextPinyin
+*/
+export type TextPinyin = {
+  sd?: string[];
+  sm?: string[];
+  text?: string;
+  ym?: string[];
+  [property: string]: any;
+}
+
+/**
+* com.congyan.entity.dto.Vowel
+*
+* Vowel
+*/
+export type Vowel = {
+  id?: number;
+  letter?: string;
+  pronunciationType?: string;
+  roughStructure?: string;
+  smoothStructure?: string;
+  [property: string]: any;
+}
+
+export const GetPinyinDetailAPI = async (text: string) => {
+  try {
+    const response = await http<GetPinyinDetailResType>({
+      url: '/dysarthria/getPinyinDetail',
+      method: 'GET',
+      params: {
+        text,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}

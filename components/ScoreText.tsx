@@ -65,6 +65,14 @@ const ScoreText = ({
   }
 
   const handleSpecializedPractice = () => {
+    setModalContent({
+      character: "",
+      sm: "",
+      ym: "",
+      sd: "",
+      score: "",
+      show: false,
+    });
     router.push({
       pathname: "/train/specialized",
       params: { character: modalContent.character },
@@ -121,9 +129,9 @@ const ScoreText = ({
               <Text status={status} category="h5" style={{ margin: 2 }}>
                 {char}
               </Text>
-              <Text style={{ fontSize: 10 }}>
+              {/* <Text style={{ fontSize: 10 }}>
                 {data.single_score?.[dataIndex]}
-              </Text>
+              </Text> */}
             </View>
           </TouchableOpacity>
         );

@@ -11,6 +11,7 @@ const TrainLayout = () => {
           options={{ headerShown: true, title: "练习" }}
         />
         <Stack.Screen name="detail" options={{ headerShown: false }} />
+        <Stack.Screen name="specialized" options={{ headerShown: false }} />
       </Stack>
     </>
   );
