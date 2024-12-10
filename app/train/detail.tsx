@@ -231,9 +231,9 @@ const TrainDetailPage = () => {
                   status={
                     item.grade === "easy"
                       ? "success"
-                      : item.grade === "common"
+                      : item.grade === "common" || item.grade === "middle rank"
                       ? "info"
-                      : item.grade === "hard"
+                      : item.grade === "hard" || item.grade === "senior"
                       ? "warning"
                       : item.grade === "challenging"
                       ? "danger"
@@ -242,9 +242,9 @@ const TrainDetailPage = () => {
                 >
                   {item.grade === "easy"
                     ? "简单"
-                    : item.grade === "common"
+                    : item.grade === "common" || item.grade === "middle rank"
                     ? "普通"
-                    : item.grade === "hard"
+                    : item.grade === "hard" || item.grade === "senior"
                     ? "困难"
                     : item.grade === "challenging"
                     ? "挑战"
