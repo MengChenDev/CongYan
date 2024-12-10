@@ -51,40 +51,43 @@ const ScoreText = ({
   text: string;
   data: DysarthriaResultVO;
 }) => {
+  if (data == null) {
+    data = {} as DysarthriaResultVO;
+  }
   return (
     <View>
       <Text category="h6">
-      声母:{" "}
-      <Text
-        category="h6"
-        status={SM_DESCRIPTIONS[data.sm ? data.sm[0] : ""]?.status}
-      >
-        {SM_DESCRIPTIONS[data.sm ? data.sm[0] : ""]?.desc}
-      </Text>
-      </Text>
-      <Text category="h6">
-      韵母:{" "}
-      <Text
-        category="h6"
-        status={YM_DESCRIPTIONS[data.ym ? data.ym[0] : ""]?.status}
-      >
-        {YM_DESCRIPTIONS[data.ym ? data.ym[0] : ""]?.desc}
-      </Text>
+        声母:{" "}
+        <Text
+          category="h6"
+          status={SM_DESCRIPTIONS[data.sm ? data.sm[0] : ""]?.status}
+        >
+          {SM_DESCRIPTIONS[data.sm ? data.sm[0] : ""]?.desc}
+        </Text>
       </Text>
       <Text category="h6">
-      声调:{" "}
-      <Text
-        category="h6"
-        status={SD_DESCRIPTIONS[data.sd ? data.sd[0] : ""]?.status}
-      >
-        {SD_DESCRIPTIONS[data.sd ? data.sd[0] : ""]?.desc}
-      </Text>
+        韵母:{" "}
+        <Text
+          category="h6"
+          status={YM_DESCRIPTIONS[data.ym ? data.ym[0] : ""]?.status}
+        >
+          {YM_DESCRIPTIONS[data.ym ? data.ym[0] : ""]?.desc}
+        </Text>
       </Text>
       <Text category="h6">
-      得分:{" "}
-      <Text category="h6" status={getStatus(Number(data.total_score))}>
-        {data.total_score}
+        声调:{" "}
+        <Text
+          category="h6"
+          status={SD_DESCRIPTIONS[data.sd ? data.sd[0] : ""]?.status}
+        >
+          {SD_DESCRIPTIONS[data.sd ? data.sd[0] : ""]?.desc}
+        </Text>
       </Text>
+      <Text category="h6">
+        得分:{" "}
+        <Text category="h6" status={getStatus(Number(data.total_score))}>
+          {data.total_score}
+        </Text>
       </Text>
     </View>
   );

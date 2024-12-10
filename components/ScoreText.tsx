@@ -46,11 +46,14 @@ const SD_DESCRIPTIONS: {
 
 const ScoreText = ({
   text,
-  data = {},
+  data = {} as DysarthriaResultVO,
 }: {
   text: string;
   data: DysarthriaResultVO;
 }) => {
+  if (data == null) {
+    data = {} as DysarthriaResultVO;
+  }
   const [modalContent, setModalContent] = useState({
     character: "",
     sm: "",
