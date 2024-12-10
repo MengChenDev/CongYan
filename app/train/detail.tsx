@@ -23,6 +23,13 @@ const BackIcon = (props: any): IconElement => (
   <Icon {...props} name="arrow-back-outline" />
 );
 
+const getStatus = (score: number) => {
+  if (score >= 90) return "success";
+  if (score >= 75) return "info";
+  if (score >= 50) return "warning";
+  return "danger";
+};
+
 const TrainDetailPage = () => {
   const { data } = useLocalSearchParams<{ data: string }>();
   const item: TrainText = JSON.parse(data);
@@ -287,6 +294,11 @@ const TrainDetailPage = () => {
                   <Layout className="h-8"></Layout>
                 )}
               </ScrollView>
+            <View style={{ position: 'absolute', right: 8, bottom: 4 }}>
+              <Text category="label" status={getStatus(dysarthriaData.total_score)}>
+                {dysarthriaData.total_score}
+              </Text>
+            </View>
             </Layout>
             <View className="flex-row items-center justify-around">
               <View style={styles.FunctionContainer}>

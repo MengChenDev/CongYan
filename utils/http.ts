@@ -5,7 +5,7 @@ import { Platform } from "react-native";
 const httpInstance = axios.create({
   baseURL: "http://61.184.3.214:8080/api",
   // baseURL: "http://api.congyan.mengchen.xyz:8080/api",
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
   },
